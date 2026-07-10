@@ -1,5 +1,5 @@
 import { CatalogPageLayout } from '../components/CatalogPageLayout';
-import { sourceCreateConfigs, sourceRows, sourceTabs, sourceTags, workspaceTabs } from '../data/sourcesCatalogData';
+import { settingsTabs, sourceCreateConfigs, sourceRows, sourceTabs, sourceTags, workspaceTabs } from '../data/sourcesCatalogData';
 
 export function SourcesPage() {
   const config = sourceCreateConfigs.sources;
@@ -38,5 +38,30 @@ export function ExtrasPage() {
 
   return (
     <CatalogPageLayout activeTabPath="/extras" tabs={sourceTabs} tags={sourceTags} createLabel={config.label} createIcon={config.icon} rows={sourceRows.extras} expandableRows={false} />
+  );
+}
+
+export function SettingsStreamsPage() {
+  return (
+    <CatalogPageLayout
+      activeTabPath="/settings/modules"
+      tabs={settingsTabs}
+      tags={sourceTags}
+      rows={sourceRows.settingsStreams}
+      showCreateAction={false}
+      interactiveExpandedCards
+    />
+  );
+}
+
+export function SettingsSourcesPage() {
+  return (
+    <CatalogPageLayout activeTabPath="/settings/options" tabs={settingsTabs} tags={sourceTags} rows={sourceRows.settingsSources} showCreateAction={false} />
+  );
+}
+
+export function SettingsShowcasesPage() {
+  return (
+    <CatalogPageLayout activeTabPath="/settings/profiles" tabs={settingsTabs} tags={sourceTags} rows={sourceRows.settingsShowcases} showCreateAction={false} />
   );
 }

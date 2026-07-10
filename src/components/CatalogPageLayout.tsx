@@ -10,6 +10,7 @@ import {
   MoreHorizontal,
   Star,
   Trash2,
+  X,
   type LucideIcon,
 } from 'lucide-react';
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
@@ -33,6 +34,7 @@ type FilterField = {
 export type CatalogRow = {
   id: string;
   favorite?: boolean;
+  unavailable?: boolean;
   tagKey?: string;
   name: string;
   editedBy: string;
@@ -46,6 +48,16 @@ export type CatalogRow = {
     heading: string;
     items: string[];
   }>;
+  settingsItems?: Array<{
+    label: string;
+    description?: string;
+    enabled?: boolean;
+    modalItems?: Array<{
+      label: string;
+      description?: string;
+      enabled?: boolean;
+    }>;
+  }>;
 };
 
 export type CatalogTab = {
@@ -54,24 +66,26 @@ export type CatalogTab = {
 };
 
 type CatalogPageLayoutProps = {
-  createLabel: string;
-  createIcon: LucideIcon;
+  createLabel?: string;
+  createIcon?: LucideIcon;
   createPath?: string;
   activeTabPath: string;
   tabs?: CatalogTab[];
   tags?: TagItem[];
   rows: CatalogRow[];
   expandableRows?: boolean;
+  showCreateAction?: boolean;
+  interactiveExpandedCards?: boolean;
 };
 
-const defaultTagItems: TagItem[] = [{ key: 'test', label: 'Тестовый тег', primary: true }];
+const defaultTagItems: TagItem[] = [{ key: 'test', label: 'Тестовая категория', primary: true }];
 
 const filterFields: FilterField[] = [
   { label: 'Search', placeholder: 'Type a value' },
   { label: 'Owner', placeholder: 'Type a value', accent: true },
   { label: 'Created by', placeholder: 'Type a value' },
   { label: 'Status', placeholder: 'Type a value' },
-  { label: 'Тег', placeholder: 'Favorite' },
+  { label: 'Категория', placeholder: 'Выберите категорию' },
   { label: 'Certified', placeholder: 'Type a value' },
   { label: 'Certified', placeholder: 'Type a value' },
   { label: 'Certified', placeholder: 'Type a value' },
@@ -91,9 +105,22 @@ export function CatalogPageLayout({
   tags = defaultTagItems,
   rows,
   expandableRows = true,
+  showCreateAction = true,
+  interactiveExpandedCards = false,
 }: CatalogPageLayoutProps) {
   const [activeTagKey, setActiveTagKey] = useState<string>('');
   const [isTagMenuOpen, setIsTagMenuOpen] = useState(false);
+  const [activeModalSection, setActiveModalSection] = useState<{
+    rowId: string;
+    rowName: string;
+    heading: string;
+    settingsItems: Array<{
+      label: string;
+      description?: string;
+      enabled?: boolean;
+    }>;
+  } | null>(null);
+  const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({});
   const tagMenuRef = useRef<HTMLDivElement | null>(null);
 
   const visibleRows = useMemo(
@@ -145,6 +172,23 @@ export function CatalogPageLayout({
     return () => window.removeEventListener('mousedown', handlePointerDown);
   }, []);
 
+  useEffect(() => {
+    if (!activeModalSection) {
+      return;
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setActiveModalSection(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [activeModalSection]);
+
+  const canShowCreateAction = showCreateAction && createLabel && CreateIcon;
+
   return (
     <div className="app-shell">
       <Header />
@@ -178,7 +222,7 @@ export function CatalogPageLayout({
                   aria-expanded={isTagMenuOpen}
                 >
                   <span className="catalog-folder-select__value">
-                    <span className="catalog-folder-select__name">{selectedTag?.label ?? 'Тег не выбран'}</span>
+                    <span className="catalog-folder-select__name">{selectedTag?.label ?? 'Категория не выбрана'}</span>
                     <span className="catalog-folder-select__count">
                       {activeTagKey ? tagCounts[activeTagKey] ?? 0 : rows.length} элементов
                     </span>
@@ -186,7 +230,7 @@ export function CatalogPageLayout({
                   <ChevronDown size={16} />
                 </button>
                 {isTagMenuOpen ? (
-                  <div className="catalog-folder-menu" role="listbox" aria-label="Список тегов">
+                  <div className="catalog-folder-menu" role="listbox" aria-label="Список категорий">
                     <button
                       className={`catalog-folder-menu__item${activeTagKey === '' ? ' is-active' : ''}`}
                       type="button"
@@ -197,7 +241,7 @@ export function CatalogPageLayout({
                         setIsTagMenuOpen(false);
                       }}
                     >
-                      <span>Тег не выбран</span>
+                      <span>Категория не выбрана</span>
                       <span>{rows.length}</span>
                     </button>
                     {tags.map((tag) => (
@@ -223,17 +267,19 @@ export function CatalogPageLayout({
           </div>
 
           <div className="catalog-toolbar__actions">
-            {createPath ? (
-              <Link className="catalog-create-button" to={createPath}>
-                <CreateIcon size={18} />
-                {createLabel}
-              </Link>
-            ) : (
-              <button className="catalog-create-button" type="button">
-                <CreateIcon size={18} />
-                {createLabel}
-              </button>
-            )}
+            {canShowCreateAction ? (
+              createPath ? (
+                <Link className="catalog-create-button" to={createPath}>
+                  <CreateIcon size={18} />
+                  {createLabel}
+                </Link>
+              ) : (
+                <button className="catalog-create-button" type="button">
+                  <CreateIcon size={18} />
+                  {createLabel}
+                </button>
+              )
+            ) : null}
             <button className="catalog-icon-button" type="button" aria-label="Экспорт">
               <Download size={22} />
             </button>
@@ -258,7 +304,7 @@ export function CatalogPageLayout({
               <span>Название</span>
               <span>Редактировал</span>
               <span>Статус</span>
-              <span>Тег</span>
+              <span>Категория</span>
               <span>Изменен</span>
               <span>Создан</span>
               <span>Владелец</span>
@@ -279,7 +325,11 @@ export function CatalogPageLayout({
 
                 return (
                   <Fragment key={row.id}>
-                    <div className={`catalog-table__row${row.favorite ? ' is-highlighted' : ''}`}>
+                    <div
+                      className={`catalog-table__row${row.favorite ? ' is-highlighted' : ''}${
+                        row.unavailable ? ' is-unavailable' : ''
+                      }`}
+                    >
                       <div className="catalog-table__name">
                         {expandableRows ? (
                           <button
@@ -293,7 +343,7 @@ export function CatalogPageLayout({
                         ) : null}
                         <Star size={16} className={row.favorite ? 'is-favorite' : ''} />
                         <div className="catalog-table__name-text">
-                          <span>{row.name}</span>
+                          <span className="catalog-table__name-label">{row.name}</span>
                           <span className="catalog-table__meta">
                             {totalRelationItems} {metaLabel}
                           </span>
@@ -321,19 +371,57 @@ export function CatalogPageLayout({
                       <div className="catalog-table__expanded">
                         <div className="catalog-expanded-card">
                           {relationSections.map((section) => (
-                            <div key={section.heading} className="catalog-expanded-section">
-                              <div className="catalog-expanded-card__header">
-                                <span className="catalog-expanded-card__label">{section.heading}</span>
-                                <span className="catalog-expanded-card__count">{section.items.length}</span>
+                            interactiveExpandedCards ? (
+                              <div key={section.heading} className="catalog-expanded-section">
+                                <div className="catalog-expanded-card__header">
+                                  <span className="catalog-expanded-card__label">{section.heading}</span>
+                                  <span className="catalog-expanded-card__count">{section.items.length}</span>
+                                </div>
+                                <div className="catalog-related-list">
+                                  {section.items.map((item) => {
+                                    const itemSettings = row.settingsItems?.find((settingsItem) => settingsItem.label === item);
+
+                                    return (
+                                      <button
+                                        key={item}
+                                        className="catalog-related-pill catalog-related-pill--button"
+                                        type="button"
+                                        onClick={() =>
+                                          setActiveModalSection({
+                                            rowId: row.id,
+                                            rowName: row.name,
+                                            heading: item,
+                                            settingsItems:
+                                              itemSettings?.modalItems ??
+                                              [{
+                                                label: itemSettings?.label ?? item,
+                                                description: itemSettings?.description ?? 'Настройка для выбранного модуля',
+                                                enabled: itemSettings?.enabled ?? true,
+                                              }],
+                                          })
+                                        }
+                                      >
+                                        {item}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
                               </div>
-                              <div className="catalog-related-list">
-                                {section.items.map((item) => (
-                                  <span key={item} className="catalog-related-pill">
-                                    {item}
-                                  </span>
-                                ))}
+                            ) : (
+                              <div key={section.heading} className="catalog-expanded-section">
+                                <div className="catalog-expanded-card__header">
+                                  <span className="catalog-expanded-card__label">{section.heading}</span>
+                                  <span className="catalog-expanded-card__count">{section.items.length}</span>
+                                </div>
+                                <div className="catalog-related-list">
+                                  {section.items.map((item) => (
+                                    <span key={item} className="catalog-related-pill">
+                                      {item}
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
+                            )
                           ))}
                         </div>
                       </div>
@@ -343,8 +431,8 @@ export function CatalogPageLayout({
               })}
               {!visibleRows.length ? (
                 <div className="catalog-table__empty">
-                  <h3>В выбранном теге пока пусто</h3>
-                  <p>Смените тег сверху, чтобы посмотреть другие mock-данные.</p>
+                  <h3>В выбранной категории пока пусто</h3>
+                  <p>Смените категорию сверху, чтобы посмотреть другие mock-данные.</p>
                 </div>
               ) : null}
             </div>
@@ -399,6 +487,65 @@ export function CatalogPageLayout({
             <span>из 10</span>
           </div>
         </footer>
+
+        {activeModalSection ? (
+          <div className="catalog-settings-modal" role="dialog" aria-modal="true" aria-label={activeModalSection.heading}>
+            <button
+              className="catalog-settings-modal__backdrop"
+              type="button"
+              aria-label="Закрыть окно"
+              onClick={() => setActiveModalSection(null)}
+            />
+            <div className="catalog-settings-modal__card">
+              <div className="catalog-settings-modal__header">
+                <div>
+                  <div className="catalog-settings-modal__title">{activeModalSection.heading}</div>
+                  <div className="catalog-settings-modal__subtitle">
+                    {activeModalSection.rowName} • {activeModalSection.settingsItems.length} параметра
+                  </div>
+                </div>
+                <button
+                  className="catalog-settings-modal__close"
+                  type="button"
+                  aria-label="Закрыть"
+                  onClick={() => setActiveModalSection(null)}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="catalog-settings-modal__list">
+                {activeModalSection.settingsItems.map((item) => {
+                  const switchKey = `${activeModalSection.rowId}:${activeModalSection.heading}:${item.label}`;
+                  const isEnabled = switchStates[switchKey] ?? item.enabled ?? true;
+
+                  return (
+                    <div key={switchKey} className="catalog-settings-modal__item">
+                      <div className="catalog-settings-modal__item-copy">
+                        <strong>{item.label}</strong>
+                        <span>{item.description ?? 'Настройка для выбранного модуля'}</span>
+                      </div>
+                      <label className="catalog-settings-modal__switch">
+                        <input
+                          type="checkbox"
+                          checked={isEnabled}
+                          onChange={() =>
+                            setSwitchStates((current) => ({
+                              ...current,
+                              [switchKey]: !isEnabled,
+                            }))
+                          }
+                        />
+                        <span className={`catalog-settings-modal__switch-slider${isEnabled ? ' is-on' : ''}`} />
+                      </label>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        ) : null}
+
       </main>
     </div>
   );

@@ -50,7 +50,7 @@ const titleColor = '#1F252D';
 export const navigationItems: MenuItem[] = [
   { label: 'Агенты', active: true, path: '/assistants', matchPaths: ['/assistants', '/agents', '/showcases'] },
   { label: 'Источники', path: '/streams', matchPaths: ['/streams', '/sources', '/source-showcases'] },
-  { label: 'Настройки', path: '/settings', matchPaths: ['/settings'] },
+  { label: 'Настройки', path: '/settings/modules', matchPaths: ['/settings', '/settings/modules', '/settings/options', '/settings/profiles'] },
 ];
 
 export const dashboardTitle = 'E-commerce: от клика до повторной покупки';

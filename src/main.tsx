@@ -6,8 +6,7 @@ import { AssistantsPage } from './pages/AssistantsPage';
 import { AiChatPage } from './pages/AiChatPage';
 import { AgentsPage } from './pages/AgentsPage';
 import { DashboardPage } from './pages/DashboardPage';
-import { SettingsPage } from './pages/SettingsPage';
-import { ExtrasPage, ShowcasesPage, SourceShowcasesPage, SourcesPage, StreamsPage } from './pages/SourcesCatalogPages';
+import { ExtrasPage, SettingsShowcasesPage, SettingsSourcesPage, SettingsStreamsPage, ShowcasesPage, SourceShowcasesPage, SourcesPage, StreamsPage } from './pages/SourcesCatalogPages';
 import '@assistant-ui/react-ui/styles/index.css';
 import './styles/global.css';
 
@@ -26,7 +25,10 @@ function AppRouter() {
         <Route path="/source-showcases" element={<SourceShowcasesPage />} />
         <Route path="/streams" element={<StreamsPage />} />
         <Route path="/extras" element={<ExtrasPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/settings" element={<Navigate to="/settings/modules" replace />} />
+        <Route path="/settings/modules" element={<SettingsStreamsPage />} />
+        <Route path="/settings/options" element={<SettingsSourcesPage />} />
+        <Route path="/settings/profiles" element={<SettingsShowcasesPage />} />
         <Route path="*" element={<Navigate to="/superset/welcome" replace />} />
       </Routes>
     </BrowserRouter>

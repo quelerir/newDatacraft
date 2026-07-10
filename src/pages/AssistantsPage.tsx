@@ -3,9 +3,9 @@ import { CatalogPageLayout, type TagItem } from '../components/CatalogPageLayout
 import { workspaceTabs } from '../data/sourcesCatalogData';
 
 const assistantTags: TagItem[] = [
-  { key: 'test', label: 'Тестовый тег', primary: true },
-  { key: 'retention', label: 'Retention' },
-  { key: 'commerce', label: 'Commerce' },
+  { key: 'test', label: 'Тестовая категория', primary: true },
+  { key: 'retention', label: 'Удержание' },
+  { key: 'commerce', label: 'Коммерция' },
 ];
 
 const assistantRows = Array.from({ length: 12 }, (_, index) => ({

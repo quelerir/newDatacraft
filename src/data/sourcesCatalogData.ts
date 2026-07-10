@@ -2,9 +2,9 @@ import { Database, Layers3, Network, Puzzle } from 'lucide-react';
 import type { CatalogRow, CatalogTab, TagItem } from '../components/CatalogPageLayout';
 
 export const sourceTags: TagItem[] = [
-  { key: 'test', label: 'Тестовый тег', primary: true },
-  { key: 'prod', label: 'Prod' },
-  { key: 'sandbox', label: 'Sandbox' },
+  { key: 'test', label: 'Тестовая категория', primary: true },
+  { key: 'prod', label: 'Продакшн' },
+  { key: 'sandbox', label: 'Песочница' },
 ];
 
 export const workspaceTabs: CatalogTab[] = [
@@ -19,6 +19,12 @@ export const sourceTabs: CatalogTab[] = [
   { label: 'Витрина', path: '/source-showcases' },
 ];
 
+export const settingsTabs: CatalogTab[] = [
+  { label: 'Модули', path: '/settings/modules' },
+  { label: 'Настройки', path: '/settings/options' },
+  { label: 'Профили', path: '/settings/profiles' },
+];
+
 export const sourceCreateConfigs = {
   extras: { label: 'Добавить элемент', icon: Puzzle },
   showcases: { label: 'Создать витрину', icon: Layers3 },
@@ -26,7 +32,10 @@ export const sourceCreateConfigs = {
   streams: { label: 'Создать поток', icon: Network },
 } as const;
 
-export const sourceRows: Record<'sources' | 'showcases' | 'streams' | 'extras', CatalogRow[]> = {
+export const sourceRows: Record<
+  'sources' | 'showcases' | 'streams' | 'extras' | 'settingsStreams' | 'settingsSources' | 'settingsShowcases',
+  CatalogRow[]
+> = {
   sources: [
     {
       id: 'source-1',
@@ -168,5 +177,299 @@ export const sourceRows: Record<'sources' | 'showcases' | 'streams' | 'extras', 
     { id: 'extra-2', tagKey: 'prod', name: 'geo_lookup_service', editedBy: 'Platform', status: 'Active', changed: '1 час назад', createdBy: 'Alex Ivanov', owner: 'PL', relationHeading: 'Используется в витринах', relationItems: ['dm_delivery_map', 'dm_session_quality'] },
     { id: 'extra-3', tagKey: 'sandbox', name: 'tmp_margin_backfill', editedBy: 'Commerce', status: 'Draft', changed: 'Сегодня', createdBy: 'Mikhail Smirnov', owner: 'CM', relationHeading: 'Используется в витринах', relationItems: ['dm_catalog_margin'] },
     { id: 'extra-4', tagKey: 'test', name: 'partner_mappings', editedBy: 'Ops', status: 'Published', changed: '2 дня назад', createdBy: 'Anna Petrova', owner: 'OP', relationHeading: 'Используется в витринах', relationItems: ['dm_partner_revenue', 'dm_roas_control'] },
+  ],
+  settingsStreams: [
+    {
+      id: 'settings-module-1',
+      favorite: true,
+      tagKey: 'test',
+      name: 'Маркетинговая аналитика',
+      editedBy: 'Data Ops',
+      status: 'Active',
+      changed: '9 мин назад',
+      createdBy: 'Ekaterina Pichugina',
+      owner: 'DO',
+      relationHeading: 'Доступные настройки',
+      relationItems: ['Ретеншн-окно', 'Атрибуция каналов', 'Часовой пояс'],
+      settingsItems: [
+        {
+          label: 'Ретеншн-окно',
+          description: 'Период удержания пользователей для расчёта повторных касаний',
+          enabled: true,
+          modalItems: [
+            { label: 'Период окна 30 дней', description: 'Основная длина окна для анализа возвратов', enabled: true },
+            { label: 'Сравнение с прошлым периодом', description: 'Показывать динамику к предыдущему окну', enabled: true },
+            { label: 'Фильтр по первому заказу', description: 'Исключать пользователей без первой покупки', enabled: false },
+          ],
+        },
+        {
+          label: 'Атрибуция каналов',
+          description: 'Правила распределения заказов между рекламными источниками',
+          enabled: true,
+          modalItems: [
+            { label: 'Модель last non-direct', description: 'Не учитывать прямые визиты как финальную атрибуцию', enabled: true },
+            { label: 'Окно атрибуции 7 дней', description: 'Связывать заказ с касанием в пределах недели', enabled: true },
+            { label: 'Переопределение UTM', description: 'Разрешать ручную нормализацию кампаний', enabled: false },
+          ],
+        },
+        {
+          label: 'Часовой пояс',
+          description: 'Локальный часовой пояс для агрегации дневных отчётов',
+          enabled: false,
+          modalItems: [
+            { label: 'Europe/Moscow', description: 'Основной часовой пояс для витрины', enabled: true },
+            { label: 'Автосдвиг по летнему времени', description: 'Автоматически корректировать исторические данные', enabled: false },
+            { label: 'Локальная граница дня', description: 'Закрывать сутки в 23:59 локального времени', enabled: true },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'settings-module-2',
+      tagKey: 'prod',
+      name: 'CRM отчёты',
+      editedBy: 'Platform',
+      status: 'Published',
+      changed: '27 мин назад',
+      createdBy: 'Alex Ivanov',
+      owner: 'PL',
+      relationHeading: 'Доступные настройки',
+      relationItems: ['Воронка стадий', 'SLA обновления', 'Права менеджеров'],
+      settingsItems: [
+        {
+          label: 'Воронка стадий',
+          description: 'Список этапов сделки, которые попадают в итоговую аналитику',
+          enabled: true,
+          modalItems: [
+            { label: 'Лид и квалификация', description: 'Включать верх воронки в общий отчёт', enabled: true },
+            { label: 'Коммерческое предложение', description: 'Выделять отдельной стадией воронки', enabled: true },
+            { label: 'Закрытые неуспешно', description: 'Показывать потери отдельно от активных сделок', enabled: false },
+          ],
+        },
+        {
+          label: 'SLA обновления',
+          description: 'Максимальная задержка обновления данных по CRM',
+          enabled: true,
+          modalItems: [
+            { label: 'Обновление каждые 15 минут', description: 'Целевой интервал синхронизации CRM данных', enabled: true },
+            { label: 'Оповещение при просрочке SLA', description: 'Создавать алерт при отставании загрузки', enabled: true },
+            { label: 'Ночной усиленный режим', description: 'Учащать пересчёт в пиковые часы закрытия дня', enabled: false },
+          ],
+        },
+        {
+          label: 'Права менеджеров',
+          description: 'Ограничения видимости по ролям внутри модуля',
+          enabled: true,
+          modalItems: [
+            { label: 'Доступ по командам', description: 'Показывать сделки только своей группы продаж', enabled: true },
+            { label: 'Видимость выручки', description: 'Скрывать сумму сделки для базовых ролей', enabled: false },
+            { label: 'Экспорт без персональных данных', description: 'Убирать контакты при выгрузке отчёта', enabled: true },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'settings-module-3',
+      tagKey: 'sandbox',
+      name: 'Unit-экономика',
+      editedBy: 'Analytics',
+      status: 'Draft',
+      changed: 'Сегодня',
+      createdBy: 'Mikhail Smirnov',
+      owner: 'AN',
+      relationHeading: 'Доступные настройки',
+      relationItems: ['Состав маржи', 'Базовая валюта', 'Налоговая модель'],
+      settingsItems: [
+        {
+          label: 'Состав маржи',
+          description: 'Компоненты, которые участвуют в расчёте contribution margin',
+          enabled: true,
+          modalItems: [
+            { label: 'Комиссия маркетплейса', description: 'Учитывать комиссию площадки в полном объёме', enabled: true },
+            { label: 'Логистика и последняя миля', description: 'Включать доставку и возвраты в маржу', enabled: true },
+            { label: 'Маркетинговые субсидии', description: 'Отражать скидки за счёт продавца отдельно', enabled: false },
+          ],
+        },
+        {
+          label: 'Базовая валюта',
+          description: 'Валюта приведения себестоимости и выручки',
+          enabled: true,
+          modalItems: [
+            { label: 'RUB как базовая валюта', description: 'Приводить все расчёты к российскому рублю', enabled: true },
+            { label: 'Курс ЦБ на дату операции', description: 'Пересчитывать валюту по официальному курсу', enabled: true },
+            { label: 'Фиксированный курс для план-факта', description: 'Использовать единый курс в управленческой отчётности', enabled: false },
+          ],
+        },
+        {
+          label: 'Налоговая модель',
+          description: 'Набор ставок и правил расчёта налоговой нагрузки',
+          enabled: false,
+          modalItems: [
+            { label: 'ОСН', description: 'Использовать общую систему налогообложения', enabled: true },
+            { label: 'Учёт НДС в марже', description: 'Отдельно показывать влияние НДС на прибыль', enabled: false },
+            { label: 'Региональные коэффициенты', description: 'Корректировать налоговую нагрузку по юрлицу', enabled: false },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'settings-module-4',
+      unavailable: true,
+      tagKey: 'prod',
+      name: 'Прогноз спроса',
+      editedBy: 'Marketplace',
+      status: 'Не активирован',
+      changed: 'Недоступно',
+      createdBy: 'Vendor package',
+      owner: 'VP',
+      relationHeading: 'Доступные настройки',
+      relationItems: ['Горизонт прогноза', 'Сезонность', 'Буфер запаса'],
+      settingsItems: [
+        {
+          label: 'Горизонт прогноза',
+          description: 'Период, на который строится прогноз спроса по SKU',
+          enabled: false,
+          modalItems: [
+            { label: 'Прогноз на 30 дней', description: 'Базовый горизонт планирования остатков', enabled: false },
+            { label: 'Квартальный прогноз', description: 'Расширенный сценарий для категорийных менеджеров', enabled: false },
+            { label: 'Помесячная детализация', description: 'Разбивка прогноза на месячные интервалы', enabled: false },
+          ],
+        },
+        {
+          label: 'Сезонность',
+          description: 'Корректировка прогноза с учётом пиков и провалов спроса',
+          enabled: false,
+          modalItems: [
+            { label: 'Праздничные пики', description: 'Усиливать спрос в праздничные периоды', enabled: false },
+            { label: 'Погодные коэффициенты', description: 'Использовать внешние сигналы для корректировок', enabled: false },
+            { label: 'История прошлого года', description: 'Опирается на аналогичный сезон прошлого года', enabled: false },
+          ],
+        },
+        {
+          label: 'Буфер запаса',
+          description: 'Резерв товара для сглаживания скачков спроса',
+          enabled: false,
+          modalItems: [
+            { label: 'Страховой запас 10%', description: 'Дополнительный резерв для топовых SKU', enabled: false },
+            { label: 'Буфер на поставку', description: 'Запас до поступления следующей партии', enabled: false },
+            { label: 'Автокоррекция буфера', description: 'Менять резерв при росте волатильности спроса', enabled: false },
+          ],
+        },
+      ],
+    },
+  ],
+  settingsSources: [
+    {
+      id: 'settings-option-1',
+      tagKey: 'prod',
+      name: 'Ретеншн-окно',
+      editedBy: 'Security',
+      status: 'Published',
+      changed: '34 мин назад',
+      createdBy: 'Alex Ivanov',
+      owner: 'SC',
+      relationHeading: 'Связи',
+      relationItems: [],
+      relationSections: [
+        { heading: 'Относится к модулю', items: ['Маркетинговая аналитика'] },
+        { heading: 'Относится к профилю', items: ['Основной профиль аналитики'] },
+      ],
+      settingsItems: [
+        { label: '30 дней', description: 'Стандартное окно удержания для продуктовой аналитики', enabled: true },
+      ],
+    },
+    {
+      id: 'settings-option-2',
+      favorite: true,
+      tagKey: 'test',
+      name: 'Воронка стадий',
+      editedBy: 'HR Ops',
+      status: 'Active',
+      changed: '11 мин назад',
+      createdBy: 'Ekaterina Pichugina',
+      owner: 'HR',
+      relationHeading: 'Связи',
+      relationItems: [],
+      relationSections: [
+        { heading: 'Относится к модулю', items: ['CRM отчёты'] },
+        { heading: 'Относится к профилю', items: ['Профиль продаж'] },
+      ],
+      settingsItems: [
+        { label: 'Лид → Контакт → Сделка', description: 'Базовый маршрут движения клиента по CRM', enabled: true },
+      ],
+    },
+    {
+      id: 'settings-option-3',
+      tagKey: 'sandbox',
+      name: 'Состав маржи',
+      editedBy: 'Infrastructure',
+      status: 'Warning',
+      changed: 'Вчера',
+      createdBy: 'Anna Petrova',
+      owner: 'IT',
+      relationHeading: 'Связи',
+      relationItems: [],
+      relationSections: [
+        { heading: 'Относится к модулю', items: ['Unit-экономика'] },
+        { heading: 'Относится к профилю', items: ['Финансовый профиль'] },
+      ],
+      settingsItems: [
+        { label: 'Комиссия + логистика + хранение', description: 'Текущий набор статей, включённых в расчёт', enabled: true },
+      ],
+    },
+  ],
+  settingsShowcases: [
+    {
+      id: 'settings-profile-1',
+      tagKey: 'sandbox',
+      name: 'Основной профиль аналитики',
+      editedBy: 'Automation',
+      status: 'Draft',
+      changed: 'Сегодня',
+      createdBy: 'Mikhail Smirnov',
+      owner: 'AU',
+      relationHeading: 'Подключённые модули',
+      relationItems: ['Маркетинговая аналитика', 'CRM отчёты'],
+      settingsItems: [
+        { label: 'Ретеншн-окно', description: 'Использовать 30-дневную модель удержания', enabled: true },
+        { label: 'Атрибуция каналов', description: 'Применять last non-direct модель распределения', enabled: true },
+        { label: 'Часовой пояс', description: 'Считать день по часовому поясу Europe/Moscow', enabled: true },
+      ],
+    },
+    {
+      id: 'settings-profile-2',
+      favorite: true,
+      tagKey: 'prod',
+      name: 'Профиль продаж',
+      editedBy: 'Platform',
+      status: 'Published',
+      changed: 'Сегодня',
+      createdBy: 'Alex Ivanov',
+      owner: 'PL',
+      relationHeading: 'Подключённые модули',
+      relationItems: ['CRM отчёты'],
+      settingsItems: [
+        { label: 'Воронка стадий', description: 'Использовать корпоративную схему стадий продаж', enabled: true },
+        { label: 'SLA обновления', description: 'Обновлять витрину каждые 15 минут', enabled: true },
+        { label: 'Права менеджеров', description: 'Разделять видимость по командам продаж', enabled: true },
+      ],
+    },
+    {
+      id: 'settings-profile-3',
+      tagKey: 'test',
+      name: 'Финансовый профиль',
+      editedBy: 'Product Ops',
+      status: 'Active',
+      changed: '2 дня назад',
+      createdBy: 'Anna Petrova',
+      owner: 'PO',
+      relationHeading: 'Подключённые модули',
+      relationItems: ['Unit-экономика'],
+      settingsItems: [
+        { label: 'Состав маржи', description: 'Включать все операционные расходы маркетплейса', enabled: true },
+        { label: 'Базовая валюта', description: 'Приводить расчёты к RUB', enabled: true },
+        { label: 'Налоговая модель', description: 'Использовать ставку ОСН для расчёта прибыли', enabled: false },
+      ],
+    },
   ],
 };
